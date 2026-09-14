@@ -1,0 +1,6 @@
+$kind: http-request
+name: https://jsonplaceholder.typicode.com/posts/1
+url: https://jsonplaceholder.typicode.com/posts/1
+method: PATCH
+settings: {}
+order: 4000

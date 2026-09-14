@@ -1,0 +1,8 @@
+$kind: http-request
+name: https://jsonplaceholder.typicode.com/comments?postId=1
+url: https://jsonplaceholder.typicode.com/comments?postId=1
+method: GET
+queryParams:
+  postId: "1"
+settings: {}
+order: 2000
