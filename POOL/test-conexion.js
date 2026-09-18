@@ -1,7 +1,7 @@
 import { pool } from "./db.js";
 
 
-export async function showOrderMovies() {
+export async function getAllMovies() {
     try {
         const res = await pool.query('SELECT * FROM movies')
         console.log(res.rows)
@@ -11,5 +11,4 @@ export async function showOrderMovies() {
         console.error(error.message)
     }
 }
-showOrderMovies();
-
+getAllMovies();
