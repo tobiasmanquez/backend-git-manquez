@@ -1,91 +1,75 @@
-import { configDotenv } from "dotenv"
-import { Pool } from 'pg'
-configDotenv()
+const express = require('express');
+const app = express();
+const PORT = 3000;
 
-export const pool = new Pool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    max: 20,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
-    maxLifetimeSeconds: 60,
-})
+app.use(express.json());
 
+let categorias = [
+  { id: 1, nombre: 'Electrónica' },
+  { id: 2, nombre: 'Hogar' },
+];
+let nextCategoriaId = 3;
 
-// const express = require('express');
-// const app = express();
-// const PORT = 3000;
+let items = [
+  { id: 1, nombre: 'Item de ejemplo', descripcion: 'Descripción de ejemplo', categoriaId: 1 },
+];
+let nextItemId = 2;
 
-// app.use(express.json());
+// --- Categorías ---
 
-// let categorias = [
-//   { id: 1, nombre: 'Electrónica' },
-//   { id: 2, nombre: 'Hogar' },
-// ];
-// let nextCategoriaId = 3;
+app.get('/categorias', (req, res) => {
+  res.json(categorias);
+});
 
-// let items = [
-//   { id: 1, nombre: 'Item de ejemplo', descripcion: 'Descripción de ejemplo', categoriaId: 1 },
-// ];
-// let nextItemId = 2;
+app.post('/categorias', (req, res) => {
+  const { nombre } = req.body;
+  if (!nombre) return res.status(400).json({ error: 'nombre es requerido' });
 
-// // --- Categorías ---
+  const nuevaCategoria = { id: nextCategoriaId++, nombre };
+  categorias.push(nuevaCategoria);
+  res.status(201).json(nuevaCategoria);
+});
 
-// app.get('/categorias', (req, res) => {
-//   res.json(categorias);
-// });
+// --- Items (relacionados a una categoría) ---
 
-// app.post('/categorias', (req, res) => {
-//   const { nombre } = req.body;
-//   if (!nombre) return res.status(400).json({ error: 'nombre es requerido' });
+app.get('/items', (req, res) => {
+  res.json(items);
+});
 
-//   const nuevaCategoria = { id: nextCategoriaId++, nombre };
-//   categorias.push(nuevaCategoria);
-//   res.status(201).json(nuevaCategoria);
-// });
+app.get('/items/:id', (req, res) => {
+  const item = items.find((i) => i.id === Number(req.params.id));
+  if (!item) return res.status(404).json({ error: 'Item no encontrado' });
+  res.json(item);
+});
 
-// // --- Items (relacionados a una categoría) ---
+app.post('/items', (req, res) => {
+  const { nombre, descripcion, categoriaId } = req.body;
+  if (!nombre) return res.status(400).json({ error: 'nombre es requerido' });
 
-// app.get('/items', (req, res) => {
-//   res.json(items);
-// });
+  const nuevoItem = { id: nextItemId++, nombre, descripcion, categoriaId };
+  items.push(nuevoItem);
+  res.status(201).json(nuevoItem);
+});
 
-// app.get('/items/:id', (req, res) => {
-//   const item = items.find((i) => i.id === Number(req.params.id));
-//   if (!item) return res.status(404).json({ error: 'Item no encontrado' });
-//   res.json(item);
-// });
+app.put('/items/:id', (req, res) => {
+  const item = items.find((i) => i.id === Number(req.params.id));
+  if (!item) return res.status(404).json({ error: 'Item no encontrado' });
 
-// app.post('/items', (req, res) => {
-//   const { nombre, descripcion, categoriaId } = req.body;
-//   if (!nombre) return res.status(400).json({ error: 'nombre es requerido' });
+  const { nombre, descripcion, categoriaId } = req.body;
+  if (nombre !== undefined) item.nombre = nombre;
+  if (descripcion !== undefined) item.descripcion = descripcion;
+  if (categoriaId !== undefined) item.categoriaId = categoriaId;
+  res.json(item);
+});
 
-//   const nuevoItem = { id: nextItemId++, nombre, descripcion, categoriaId };
-//   items.push(nuevoItem);
-//   res.status(201).json(nuevoItem);
-// });
+app.delete('/items/:id', (req, res) => {
+  const index = items.findIndex((i) => i.id === Number(req.params.id));
+  if (index === -1) return res.status(404).json({ error: 'Item no encontrado' });
 
-// app.put('/items/:id', (req, res) => {
-//   const item = items.find((i) => i.id === Number(req.params.id));
-//   if (!item) return res.status(404).json({ error: 'Item no encontrado' });
+  items.splice(index, 1);
+  res.status(204).send();
+});
 
-//   const { nombre, descripcion, categoriaId } = req.body;
-//   if (nombre !== undefined) item.nombre = nombre;
-//   if (descripcion !== undefined) item.descripcion = descripcion;
-//   if (categoriaId !== undefined) item.categoriaId = categoriaId;
-//   res.json(item);
-// });
-
-// app.delete('/items/:id', (req, res) => {
-//   const index = items.findIndex((i) => i.id === Number(req.params.id));
-//   if (index === -1) return res.status(404).json({ error: 'Item no encontrado' });
-
-//   items.splice(index, 1);
-//   res.status(204).send();
-// });
-
-// app.listen(PORT, () => {
-//   console.log(`starter-api corriendo en http://localhost:${PORT}`);
-// });
+app.listen(PORT, () => {
+  console.log(`starter-api corriendo en http://localhost:${PORT}`);
+});

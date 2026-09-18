@@ -1,4 +1,4 @@
-import { pool } from "./index.js";
+import { pool } from "./db.js";
 
 
 export async function showOrderMovies() {
@@ -12,3 +12,4 @@ export async function showOrderMovies() {
     }
 }
 showOrderMovies();
+
